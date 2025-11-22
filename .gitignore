@@ -33,9 +33,6 @@ Thumbs.db
 .env
 .env.*
 
-# Go Modules cache (not needed if you use Go Modules properly)
-go.sum
-
 # Node modules (if any JS tools used)
 node_modules/
 
