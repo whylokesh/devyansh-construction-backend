@@ -48,9 +48,9 @@ CREATE TABLE workers (
 -- 3. sites
 CREATE TABLE sites (
     id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
     client_name VARCHAR(255) NOT NULL,
     client_phone VARCHAR(50),
-    name VARCHAR(255) NOT NULL,
     location VARCHAR(255),
     site_documents TEXT,
     additional_details JSONB DEFAULT '{}'::jsonb,
