@@ -8,6 +8,7 @@ import (
 	"github.com/whylokesh/devyansh-construction-backend/internal/config"
 	"github.com/whylokesh/devyansh-construction-backend/internal/db"
 	"github.com/whylokesh/devyansh-construction-backend/internal/handler"
+	"github.com/whylokesh/devyansh-construction-backend/internal/middleware"
 	"github.com/whylokesh/devyansh-construction-backend/internal/repository"
 	"github.com/whylokesh/devyansh-construction-backend/internal/routes"
 	"github.com/whylokesh/devyansh-construction-backend/internal/service"
@@ -19,15 +20,21 @@ func main() {
 
 	// Repositories
 	userRepo := repository.NewUserRepository(db.DB)
+	siteRepo := repository.NewSiteRepository(db.DB)
 
 	// Services
 	userService := service.NewUserService(userRepo, cfg.JWTSecret)
+	siteService := service.NewSiteService(siteRepo)
 
 	// Handlers
 	userHandler := handler.NewUserHandler(userService)
+	siteHandler := handler.NewSiteHandler(siteService)
+
+	// Middleware
+	authMiddleware := middleware.NewAuthMiddleware(cfg.JWTSecret)
 
 	r := chi.NewRouter()
-	routes.RegisterRoutes(r, userHandler)
+	routes.RegisterRoutes(r, userHandler, siteHandler, authMiddleware)
 
 	log.Println("Server starting on http://localhost:8080 🚀")
 	http.ListenAndServe(":8080", r)

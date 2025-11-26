@@ -6,8 +6,7 @@ import (
 )
 
 func RegisterUserRoutes(r chi.Router, userHandler *handler.UserHandler) {
-	r.Route("/users", func(r chi.Router) {
-		r.Post("/signup", userHandler.Signup)
-		r.Post("/login", userHandler.Login)
-	})
+	// Routes for user
+	r.Post("/signup", userHandler.Signup)
+	r.Post("/login", userHandler.Login)
 }
