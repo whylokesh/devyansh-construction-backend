@@ -13,11 +13,15 @@ create-migration:
 
 # 🧱 Migrations (production)
 migrate-prod-up:
-	migrate -path internal/db/migrations -database "postgres://postgres:H32sOM3w8ehg3picaJwDFewFRnF8gl6IBLsOyZAwqgytor9Zhq0dD5KZgwkjAlak@31.97.205.243:5432/postgres?sslmode=disable" up
+	migrate -path internal/db/migrations -database "$(CLOUD_DB_URL_EXTERNAL)" up
 
 migrate-prod-down:
-	migrate -path internal/db/migrations -database "postgres://postgres:H32sOM3w8ehg3picaJwDFewFRnF8gl6IBLsOyZAwqgytor9Zhq0dD5KZgwkjAlak@31.97.205.243:5432/postgres?sslmode=disable" down
+	migrate -path internal/db/migrations -database "$(CLOUD_DB_URL_EXTERNAL)" down
 
 # 🚀 Run server
 run:
 	go run cmd/server/main.go
+
+# 🔄 Live Reload
+watch:
+	air

@@ -21,82 +21,80 @@ func NewSiteHandler(service *service.SiteService) *SiteHandler {
 func (h *SiteHandler) CreateSite(w http.ResponseWriter, r *http.Request) {
 	var site models.Site
 	if err := json.NewDecoder(r.Body).Decode(&site); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		RespondWithError(w, http.StatusBadRequest, "Invalid request body")
 		return
 	}
 
 	if err := h.service.CreateSite(r.Context(), &site); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(site)
+	RespondWithJSON(w, http.StatusCreated, "Site created successfully", site)
 }
 
 func (h *SiteHandler) GetSiteByID(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		http.Error(w, "Invalid site ID", http.StatusBadRequest)
+		RespondWithError(w, http.StatusBadRequest, "Invalid site ID")
 		return
 	}
 
 	site, err := h.service.GetSiteByID(r.Context(), id)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		RespondWithError(w, http.StatusNotFound, err.Error())
 		return
 	}
 
-	json.NewEncoder(w).Encode(site)
+	RespondWithJSON(w, http.StatusOK, "Site retrieved successfully", site)
 }
 
 func (h *SiteHandler) UpdateSite(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		http.Error(w, "Invalid site ID", http.StatusBadRequest)
+		RespondWithError(w, http.StatusBadRequest, "Invalid site ID")
 		return
 	}
 
 	var site models.Site
 	if err := json.NewDecoder(r.Body).Decode(&site); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		RespondWithError(w, http.StatusBadRequest, "Invalid request body")
 		return
 	}
 	site.ID = id
 
 	if err := h.service.UpdateSite(r.Context(), &site); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	json.NewEncoder(w).Encode(site)
+	RespondWithJSON(w, http.StatusOK, "Site updated successfully", site)
 }
 
 func (h *SiteHandler) DeleteSite(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		http.Error(w, "Invalid site ID", http.StatusBadRequest)
+		RespondWithError(w, http.StatusBadRequest, "Invalid site ID")
 		return
 	}
 
 	if err := h.service.DeleteSite(r.Context(), id); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"message": "Site deleted successfully"})
+	RespondWithJSON(w, http.StatusOK, "Site deleted successfully", nil)
 }
 
 func (h *SiteHandler) ListSites(w http.ResponseWriter, r *http.Request) {
 	sites, err := h.service.ListSites(r.Context())
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	json.NewEncoder(w).Encode(sites)
+	RespondWithJSON(w, http.StatusOK, "Sites retrieved successfully", sites)
 }

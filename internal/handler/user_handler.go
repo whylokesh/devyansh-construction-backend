@@ -18,19 +18,17 @@ func NewUserHandler(service *service.UserService) *UserHandler {
 func (h *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	var input service.RegisterUserInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		http.Error(w, "Invalid input", http.StatusBadRequest)
+		RespondWithError(w, http.StatusBadRequest, "Invalid input")
 		return
 	}
 
 	user, err := h.service.RegisterUser(r.Context(), input)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		RespondWithError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(user)
+	RespondWithJSON(w, http.StatusCreated, "User registered successfully", user)
 }
 
 func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
@@ -39,22 +37,20 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		Password string `json:"password"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		http.Error(w, "Invalid input", http.StatusBadRequest)
+		RespondWithError(w, http.StatusBadRequest, "Invalid input")
 		return
 	}
 
 	token, user, err := h.service.LoginUser(r.Context(), input.Email, input.Password)
 	if err != nil {
-		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
+		RespondWithError(w, http.StatusUnauthorized, "Invalid email or password")
 		return
 	}
 
-	response := map[string]interface{}{
-		"message": "Login successful",
-		"token":   token,
-		"user":    user,
+	data := map[string]interface{}{
+		"token": token,
+		"user":  user,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	RespondWithJSON(w, http.StatusOK, "Login successful", data)
 }
