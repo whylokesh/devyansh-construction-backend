@@ -60,6 +60,29 @@ func (r *AttendanceRepository) GetAttendance(ctx context.Context, workerID, site
 	return &attendance, nil
 }
 
+func (r *AttendanceRepository) GetAttendanceByID(ctx context.Context, id int) (*models.Attendance, error) {
+	query := `
+		SELECT id, worker_id, site_id, date, status, note, created_at, updated_at
+		FROM attendance
+		WHERE id = $1
+	`
+	var attendance models.Attendance
+	err := r.db.QueryRow(ctx, query, id).Scan(
+		&attendance.ID,
+		&attendance.WorkerID,
+		&attendance.SiteID,
+		&attendance.Date,
+		&attendance.Status,
+		&attendance.Note,
+		&attendance.CreatedAt,
+		&attendance.UpdatedAt,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get attendance by id: %w", err)
+	}
+	return &attendance, nil
+}
+
 func (r *AttendanceRepository) UpdateAttendance(ctx context.Context, attendance *models.Attendance) error {
 	query := `
 		UPDATE attendance
