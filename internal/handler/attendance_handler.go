@@ -9,6 +9,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/whylokesh/devyansh-construction-backend/internal/models"
 	"github.com/whylokesh/devyansh-construction-backend/internal/service"
+	"github.com/whylokesh/devyansh-construction-backend/internal/utils"
 )
 
 type AttendanceHandler struct {
@@ -22,79 +23,79 @@ func NewAttendanceHandler(service *service.AttendanceService) *AttendanceHandler
 func (h *AttendanceHandler) CreateAttendance(w http.ResponseWriter, r *http.Request) {
 	var attendance models.Attendance
 	if err := json.NewDecoder(r.Body).Decode(&attendance); err != nil {
-		RespondWithError(w, http.StatusBadRequest, "Invalid request body")
+		utils.RespondWithError(w, http.StatusBadRequest, "Invalid request body")
 		return
 	}
 
 	if err := h.service.CreateAttendance(r.Context(), &attendance); err != nil {
-		RespondWithError(w, http.StatusInternalServerError, err.Error())
+		utils.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	RespondWithJSON(w, http.StatusCreated, "Attendance recorded successfully", attendance)
+	utils.RespondWithJSON(w, http.StatusCreated, "Attendance recorded successfully", attendance)
 }
 
 func (h *AttendanceHandler) GetAttendanceByID(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		RespondWithError(w, http.StatusBadRequest, "Invalid attendance ID")
+		utils.RespondWithError(w, http.StatusBadRequest, "Invalid attendance ID")
 		return
 	}
 
 	attendance, err := h.service.GetAttendanceByID(r.Context(), id)
 	if err != nil {
-		RespondWithError(w, http.StatusNotFound, err.Error())
+		utils.RespondWithError(w, http.StatusNotFound, err.Error())
 		return
 	}
 
-	RespondWithJSON(w, http.StatusOK, "Attendance retrieved successfully", attendance)
+	utils.RespondWithJSON(w, http.StatusOK, "Attendance retrieved successfully", attendance)
 }
 
 func (h *AttendanceHandler) UpdateAttendance(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		RespondWithError(w, http.StatusBadRequest, "Invalid attendance ID")
+		utils.RespondWithError(w, http.StatusBadRequest, "Invalid attendance ID")
 		return
 	}
 
 	var attendance models.Attendance
 	if err := json.NewDecoder(r.Body).Decode(&attendance); err != nil {
-		RespondWithError(w, http.StatusBadRequest, "Invalid request body")
+		utils.RespondWithError(w, http.StatusBadRequest, "Invalid request body")
 		return
 	}
 	attendance.ID = id
 
 	if err := h.service.UpdateAttendance(r.Context(), &attendance); err != nil {
-		RespondWithError(w, http.StatusInternalServerError, err.Error())
+		utils.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	RespondWithJSON(w, http.StatusOK, "Attendance updated successfully", attendance)
+	utils.RespondWithJSON(w, http.StatusOK, "Attendance updated successfully", attendance)
 }
 
 func (h *AttendanceHandler) DeleteAttendance(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		RespondWithError(w, http.StatusBadRequest, "Invalid attendance ID")
+		utils.RespondWithError(w, http.StatusBadRequest, "Invalid attendance ID")
 		return
 	}
 
 	if err := h.service.DeleteAttendance(r.Context(), id); err != nil {
-		RespondWithError(w, http.StatusInternalServerError, err.Error())
+		utils.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	RespondWithJSON(w, http.StatusOK, "Attendance deleted successfully", nil)
+	utils.RespondWithJSON(w, http.StatusOK, "Attendance deleted successfully", nil)
 }
 
 func (h *AttendanceHandler) ListAttendanceBySite(w http.ResponseWriter, r *http.Request) {
 	siteIDStr := chi.URLParam(r, "siteId")
 	siteID, err := strconv.Atoi(siteIDStr)
 	if err != nil {
-		RespondWithError(w, http.StatusBadRequest, "Invalid site ID")
+		utils.RespondWithError(w, http.StatusBadRequest, "Invalid site ID")
 		return
 	}
 
@@ -103,7 +104,7 @@ func (h *AttendanceHandler) ListAttendanceBySite(w http.ResponseWriter, r *http.
 	if dateStr != "" {
 		date, err = time.Parse("2006-01-02", dateStr)
 		if err != nil {
-			RespondWithError(w, http.StatusBadRequest, "Invalid date format (YYYY-MM-DD)")
+			utils.RespondWithError(w, http.StatusBadRequest, "Invalid date format (YYYY-MM-DD)")
 			return
 		}
 	} else {
@@ -112,18 +113,18 @@ func (h *AttendanceHandler) ListAttendanceBySite(w http.ResponseWriter, r *http.
 
 	attendances, err := h.service.ListAttendanceBySite(r.Context(), siteID, date)
 	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, err.Error())
+		utils.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	RespondWithJSON(w, http.StatusOK, "Attendance list retrieved successfully", attendances)
+	utils.RespondWithJSON(w, http.StatusOK, "Attendance list retrieved successfully", attendances)
 }
 
 func (h *AttendanceHandler) ListAttendanceByWorker(w http.ResponseWriter, r *http.Request) {
 	workerIDStr := chi.URLParam(r, "workerId")
 	workerID, err := strconv.Atoi(workerIDStr)
 	if err != nil {
-		RespondWithError(w, http.StatusBadRequest, "Invalid worker ID")
+		utils.RespondWithError(w, http.StatusBadRequest, "Invalid worker ID")
 		return
 	}
 
@@ -134,7 +135,7 @@ func (h *AttendanceHandler) ListAttendanceByWorker(w http.ResponseWriter, r *htt
 	if startDateStr != "" {
 		startDate, err = time.Parse("2006-01-02", startDateStr)
 		if err != nil {
-			RespondWithError(w, http.StatusBadRequest, "Invalid start date format (YYYY-MM-DD)")
+			utils.RespondWithError(w, http.StatusBadRequest, "Invalid start date format (YYYY-MM-DD)")
 			return
 		}
 	} else {
@@ -146,7 +147,7 @@ func (h *AttendanceHandler) ListAttendanceByWorker(w http.ResponseWriter, r *htt
 	if endDateStr != "" {
 		endDate, err = time.Parse("2006-01-02", endDateStr)
 		if err != nil {
-			RespondWithError(w, http.StatusBadRequest, "Invalid end date format (YYYY-MM-DD)")
+			utils.RespondWithError(w, http.StatusBadRequest, "Invalid end date format (YYYY-MM-DD)")
 			return
 		}
 	} else {
@@ -155,9 +156,9 @@ func (h *AttendanceHandler) ListAttendanceByWorker(w http.ResponseWriter, r *htt
 
 	attendances, err := h.service.ListAttendanceByWorker(r.Context(), workerID, startDate, endDate)
 	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, err.Error())
+		utils.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	RespondWithJSON(w, http.StatusOK, "Attendance list retrieved successfully", attendances)
+	utils.RespondWithJSON(w, http.StatusOK, "Attendance list retrieved successfully", attendances)
 }

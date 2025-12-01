@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/whylokesh/devyansh-construction-backend/internal/service"
+	"github.com/whylokesh/devyansh-construction-backend/internal/utils"
 )
 
 type UserHandler struct {
@@ -18,17 +19,17 @@ func NewUserHandler(service *service.UserService) *UserHandler {
 func (h *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	var input service.RegisterUserInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		RespondWithError(w, http.StatusBadRequest, "Invalid input")
+		utils.RespondWithError(w, http.StatusBadRequest, "Invalid input")
 		return
 	}
 
 	user, err := h.service.RegisterUser(r.Context(), input)
 	if err != nil {
-		RespondWithError(w, http.StatusBadRequest, err.Error())
+		utils.RespondWithError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	RespondWithJSON(w, http.StatusCreated, "User registered successfully", user)
+	utils.RespondWithJSON(w, http.StatusCreated, "User registered successfully", user)
 }
 
 func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
@@ -37,13 +38,13 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		Password string `json:"password"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		RespondWithError(w, http.StatusBadRequest, "Invalid input")
+		utils.RespondWithError(w, http.StatusBadRequest, "Invalid input")
 		return
 	}
 
 	token, user, err := h.service.LoginUser(r.Context(), input.Email, input.Password)
 	if err != nil {
-		RespondWithError(w, http.StatusUnauthorized, "Invalid email or password")
+		utils.RespondWithError(w, http.StatusUnauthorized, "Invalid email or password")
 		return
 	}
 
@@ -52,5 +53,5 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		"user":  user,
 	}
 
-	RespondWithJSON(w, http.StatusOK, "Login successful", data)
+	utils.RespondWithJSON(w, http.StatusOK, "Login successful", data)
 }

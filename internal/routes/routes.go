@@ -8,7 +8,7 @@ import (
 	"github.com/whylokesh/devyansh-construction-backend/internal/middleware"
 )
 
-func RegisterRoutes(r chi.Router, userHandler *handler.UserHandler, siteHandler *handler.SiteHandler, workerHandler *handler.WorkerHandler, attendanceHandler *handler.AttendanceHandler, authMiddleware *middleware.AuthMiddleware) {
+func RegisterRoutes(r chi.Router, userHandler *handler.UserHandler, siteHandler *handler.SiteHandler, workerHandler *handler.WorkerHandler, attendanceHandler *handler.AttendanceHandler, advanceHandler *handler.AdvanceHandler, authMiddleware *middleware.AuthMiddleware) {
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("devyansh-construction-backend is workring"))
 	})
@@ -25,6 +25,9 @@ func RegisterRoutes(r chi.Router, userHandler *handler.UserHandler, siteHandler 
 		})
 		r.Route("/attendance", func(r chi.Router) {
 			RegisterAttendanceRoutes(r, attendanceHandler, authMiddleware)
+		})
+		r.Route("/advances", func(r chi.Router) {
+			RegisterAdvanceRoutes(r, advanceHandler, authMiddleware)
 		})
 	})
 }
